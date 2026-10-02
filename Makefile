@@ -31,7 +31,7 @@ ARM_LDFLAGS = $(MCU_FLAGS) -Tlinker.ld -nostdlib -nostartfiles \
 HOST_CFLAGS = -Iinclude -Wall -Wextra -Werror -O2
 
 # Bare-metal firmware sources
-SRCS        = src/main.c src/startup.c src/uart.c src/systick.c src/iwdg.c src/cli.c
+SRCS        = src/main.c src/startup.c src/uart.c src/systick.c src/iwdg.c src/cli.c src/os_scheduler.c
 OBJS        = $(patsubst src/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 ifeq ($(OS),Windows_NT)

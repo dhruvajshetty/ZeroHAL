@@ -10,6 +10,25 @@
 
 #include "zero_hal.h"
 
+/* --- System Tasks --- */
+
+static void task_heartbeat(void) {
+    GPIOA_ODR ^= GPIO_PIN_5; // Toggle PA5 User LED
+}
+
+static void task_cli_process(void) {
+    char incoming;
+    RingBuffer *rx_ring = uart2_get_rx_buffer();
+    int limit = 16; // Process up to 16 chars per tick to prevent starvation
+    while (limit-- && ring_buffer_pop(rx_ring, &incoming)) {
+        cli_handle_char(incoming);
+    }
+}
+
+static void task_watchdog_feed(void) {
+    iwdg_feed();
+}
+
 int main(void) {
     /* 1. Initialize ARM SysTick 1ms core timer */
     systick_init();
@@ -22,7 +41,7 @@ int main(void) {
 
     /* 4. Boot Banner */
     uart2_write_string("\r\n================================================\r\n");
-    uart2_write_string(" [ZeroHAL] Bare-Metal Embedded OS v2.0 Online!  \r\n");
+    uart2_write_string(" [ZeroHAL] Bare-Metal Embedded OS v2.1 Online!  \r\n");
     uart2_write_string("================================================\r\n");
 
     /* 5. Safety Audit: Inspect silicon reset flags in RCC_CSR */
@@ -36,29 +55,22 @@ int main(void) {
 
     /* 6. Arm Independent Hardware Watchdog (2000ms safety window) */
     iwdg_init(2000);
-    uart2_write_string("[IWDG] Hardware Watchdog Armed: 2000ms timeout\r\n\r\n");
+    uart2_write_string("[IWDG] Hardware Watchdog Armed: 2000ms timeout\r\n");
+
+    /* 7. Setup Cooperative Task Scheduler */
+    os_scheduler_init();
+    os_add_task(task_watchdog_feed, 500); // Feed watchdog every 500ms safely
+    os_add_task(task_cli_process,    10); // Poll UART queue every 10ms
+    os_add_task(task_heartbeat,    1000); // Blink LED every 1000ms
+
+    uart2_write_string("[OS] Cooperative Scheduler running with 3 tasks.\r\n\r\n");
 
     /* Render initial prompt */
     cli_prompt();
 
-    uint32_t last_heartbeat = millis();
-
+    /* 8. Main OS Loop */
     while (1) {
-        /* Refresh hardware watchdog counter during normal operational flow */
-        iwdg_feed();
-
-        /* Drain asynchronous characters received by USART2 ISR into CLI parser */
-        char incoming;
-        RingBuffer *rx_ring = uart2_get_rx_buffer();
-        while (ring_buffer_pop(rx_ring, &incoming)) {
-            cli_handle_char(incoming);
-        }
-
-        /* Periodic 1000ms background heartbeat on PA5 User LED */
-        if ((millis() - last_heartbeat) >= 1000U) {
-            last_heartbeat = millis();
-            GPIOA_ODR ^= GPIO_PIN_5;
-        }
+        os_run_scheduler();
     }
 
     return 0;

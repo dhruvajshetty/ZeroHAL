@@ -15,5 +15,6 @@
 #include "uart.h"
 #include "iwdg.h"
 #include "cli.h"
+#include "os_scheduler.h"
 
 #endif /* ZERO_HAL_H */

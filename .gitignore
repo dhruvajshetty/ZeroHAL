@@ -1,0 +1,43 @@
+# ==============================================================================
+# ZeroHAL - .gitignore
+# ==============================================================================
+
+# Build Output Directories
+build/
+bin/
+out/
+target/
+
+# Object and Dependency Files
+*.o
+*.obj
+*.d
+*.su
+
+# Compiled Firmware & Symbol Tables
+*.elf
+*.bin
+*.hex
+*.map
+*.srec
+
+# Host Executables
+*.exe
+*.out
+*.app
+
+# IDE & Editor Configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.launch
+.project
+.cproject
+.settings/
+
+# OS-Specific Metadata
+.DS_Store
+Thumbs.db
+desktop.ini

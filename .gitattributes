@@ -1,0 +1,23 @@
+# ==============================================================================
+# ZeroHAL - .gitattributes
+# ==============================================================================
+
+# Default line endings to LF across all platforms
+* text=auto eol=lf
+
+# Source & Script Files
+*.c text eol=lf
+*.h text eol=lf
+*.ld text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Makefile text eol=lf
+
+# Binary Files
+*.bin binary
+*.hex binary
+*.elf binary
+*.exe binary
+*.png binary
+*.jpg binary

@@ -1,0 +1,66 @@
+name: ZeroHAL Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  host-verification:
+    name: Host Verification (Unit Tests & Bus Simulator)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Host Compiler
+        run: |
+          gcc --version
+          make --version
+
+      - name: Execute Automated Unit Test Suite
+        run: make test
+
+      - name: Build and Validate Silicon Simulator (Headless)
+        run: |
+          make sim
+          ./build/simulator --headless
+
+  baremetal-arm-build:
+    name: Bare-Metal Silicon Cross-Compilation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install ARM Embedded Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+
+      - name: Verify Toolchain
+        run: |
+          arm-none-eabi-gcc --version
+          arm-none-eabi-size --version
+
+      - name: Compile Silicon Firmware (Strict -Werror)
+        run: make firmware
+
+      - name: Verify Output Artifacts
+        run: |
+          test -f build/zero_hal.elf
+          test -f build/zero_hal.bin
+          test -f build/zero_hal.hex
+          ls -la build/
+
+      - name: Upload Firmware Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: zero_hal_firmware
+          path: |
+            build/zero_hal.elf
+            build/zero_hal.bin
+            build/zero_hal.hex
+            build/zero_hal.map
+          if-no-files-found: error

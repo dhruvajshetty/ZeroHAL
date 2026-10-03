@@ -34,6 +34,7 @@
 #define RCC_BASE                (AHB1PERIPH_BASE + 0x3800UL)
 #define USART2_BASE             (APB1PERIPH_BASE + 0x4400UL)
 #define IWDG_BASE               (APB1PERIPH_BASE + 0x3000UL)
+#define TIM2_BASE               (APB1PERIPH_BASE + 0x0000UL)
 
 /* ==============================================================================
  * 2. MEMORY-MAPPED VOLATILE REGISTERS (Hardware Mailboxes)
@@ -46,6 +47,7 @@
 
 /* RCC Bitfield Definitions */
 #define RCC_AHB1ENR_GPIOAEN     (1UL << 0)   /* Bit 0: GPIO Port A Clock Enable */
+#define RCC_APB1ENR_TIM2EN      (1UL << 0)   /* Bit 0: TIM2 Peripheral Clock Enable */
 #define RCC_APB1ENR_USART2EN    (1UL << 17)  /* Bit 17: USART2 Peripheral Clock Enable */
 #define RCC_CSR_RMVF            (1UL << 24)  /* Bit 24: Remove Reset Flag */
 #define RCC_CSR_IWDGRSTF        (1UL << 29)  /* Bit 29: Independent Watchdog Reset Flag */
@@ -112,5 +114,13 @@
 #define SCB_AIRCR_SYSRESETREQ   (1UL << 2)
 
 #define SCB_CPACR               (*((volatile uint32_t *)(SCB_BASE + 0x88UL)))
+
+/* --- TIM2 Timer --- */
+#define TIM2_CR1                (*((volatile uint32_t *)(TIM2_BASE + 0x00UL)))
+#define TIM2_CCMR1              (*((volatile uint32_t *)(TIM2_BASE + 0x18UL)))
+#define TIM2_CCER               (*((volatile uint32_t *)(TIM2_BASE + 0x20UL)))
+#define TIM2_PSC                (*((volatile uint32_t *)(TIM2_BASE + 0x28UL)))
+#define TIM2_ARR                (*((volatile uint32_t *)(TIM2_BASE + 0x2CUL)))
+#define TIM2_CCR1               (*((volatile uint32_t *)(TIM2_BASE + 0x34UL)))
 
 #endif /* STM32F4XX_REGS_H */

@@ -32,10 +32,6 @@ void uart2_init(void) {
     GPIOA_MODER &= ~((3UL << (2 * 2)) | (3UL << (3 * 2)));
     GPIOA_MODER |=  ((2UL << (2 * 2)) | (2UL << (3 * 2)));
 
-    /* MODER: General Purpose Output (01b) for PA5 (User LED) */
-    GPIOA_MODER &= ~(3UL << (5 * 2));
-    GPIOA_MODER |=  (1UL << (5 * 2));
-
     /* PUPDR: Internal pull-up (01b) on PA3 (RX pin idle high) */
     GPIOA_PUPDR &= ~(3UL << (3 * 2));
     GPIOA_PUPDR |=  (1UL << (3 * 2));

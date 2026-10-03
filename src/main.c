@@ -12,8 +12,20 @@
 
 /* --- System Tasks --- */
 
-static void task_heartbeat(void) {
-    GPIOA_ODR ^= GPIO_PIN_5; // Toggle PA5 User LED
+static void task_pwm_dimmer(void) {
+    static int8_t duty = 0;
+    static int8_t direction = 1;
+
+    duty += (direction * 2);
+    if (duty >= 100) {
+        duty = 100;
+        direction = -1;
+    } else if (duty <= 0) {
+        duty = 0;
+        direction = 1;
+    }
+
+    pwm_set_duty((uint8_t)duty);
 }
 
 static void task_cli_process(void) {
@@ -57,11 +69,15 @@ int main(void) {
     iwdg_init(2000);
     uart2_write_string("[IWDG] Hardware Watchdog Armed: 2000ms timeout\r\n");
 
+    /* 6b. Initialize PWM for the LED */
+    pwm_init();
+    uart2_write_string("[PWM]  TIM2_CH1 initialized on PA5 for LED Dimming\r\n");
+
     /* 7. Setup Cooperative Task Scheduler */
     os_scheduler_init();
     os_add_task(task_watchdog_feed, 500); // Feed watchdog every 500ms safely
     os_add_task(task_cli_process,    10); // Poll UART queue every 10ms
-    os_add_task(task_heartbeat,    1000); // Blink LED every 1000ms
+    os_add_task(task_pwm_dimmer,     20); // Update PWM duty cycle every 20ms
 
     uart2_write_string("[OS] Cooperative Scheduler running with 3 tasks.\r\n\r\n");
 

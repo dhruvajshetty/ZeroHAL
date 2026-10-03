@@ -16,5 +16,6 @@
 #include "iwdg.h"
 #include "cli.h"
 #include "os_scheduler.h"
+#include "pwm.h"
 
 #endif /* ZERO_HAL_H */
